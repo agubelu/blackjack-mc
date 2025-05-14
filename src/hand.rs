@@ -8,12 +8,28 @@ pub enum Hand {
 }
 
 impl Hand {
+    pub fn from_cards(c1: u8, c2: u8) -> Self {
+        match (c1, c2) {
+            _ if c1 == c2 => Doubles(c1),
+            (1, _) | (_, 1) => Soft(c1 + c2 + 10),
+            _ => Hard(c1 + c2),
+        }
+    }
+
     pub fn value(&self) -> u8 {
         match self {
             Soft(x) => *x,
             Hard(x) => *x,
             Doubles(1) => 12, // edge case because AA == soft 12
             Doubles(x) => 2 * x,
+        }
+    }
+
+    pub fn unpack(&self) -> u8 {
+        match self {
+            Soft(x) => *x,
+            Hard(x) => *x,
+            Doubles(x) => *x,
         }
     }
 
@@ -29,18 +45,10 @@ impl Hand {
 
         match self {
             Soft(_) | Doubles(1) => {
-                if new_val <= 21 {
-                    Soft(new_val)
-                } else {
-                    Hard(new_val - 10)
-                }
+                if new_val <= 21 { Soft(new_val) } else { Hard(new_val - 10) }
             }
             Hard(_) | Doubles(_) => {
-                if new_card == 1 && val <= 10 {
-                    Soft(new_val + 10)
-                } else {
-                    Hard(new_val)
-                }
+                if new_card == 1 && val <= 10 { Soft(new_val + 10) } else { Hard(new_val) }
             }
         }
     }
