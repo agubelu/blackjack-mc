@@ -52,17 +52,11 @@ impl<'a> Round<'a> {
         }
 
         // Player has some hands alive, simulate dealer behavior.
-        while dealer_hand.value() <= 21 {
-            let action = self.ctx.dealer.decide(dealer_hand, 0, 0);
-            debug_println!("Dealer has: {:?} -> {action:?}", dealer_hand);
-            match action {
-                Hit => {
-                    let card = self.draw();
-                    dealer_hand = dealer_hand.add_card(card);
-                }
-                Stand => break,
-                Double | Split | Surrender => panic!("Suspicious dealer behavior."),
-            }
+        // Dealer will always either hit or stand.
+        debug_println!("Dealer has: {:?}", dealer_hand);
+        while dealer_hand.value() <= 21 && self.ctx.dealer.decide(dealer_hand, 0, 0) == Hit {
+            dealer_hand = dealer_hand.add_card(self.draw());
+            debug_println!("Dealer has: {:?}", dealer_hand);
         }
 
         let dealer_hand = dealer_hand.value();
@@ -132,14 +126,14 @@ impl<'a> Round<'a> {
         // Two edge cases to handle here: splitting and doubling
 
         // Splitting is allowed if:
-        //   - Hands is doubles AND max splits not reached AND (first split OR hand isn't aces OR aces can be resplit)
+        // Hands is doubles AND max splits not reached AND (first split OR hand isn't aces OR aces can be resplit)
         let can_split = matches!(hand, Hand::Doubles(_)) &&
                         self.splits + 1 < self.ctx.rules.max_split_hands.unwrap_or(u32::MAX) &&
                         (self.splits == 0 || hand.unpack() != 1 || self.ctx.rules.can_resplit_aces);
         let split = if can_split { Split.bitmap() } else { 0 };
 
         // Doubling is allowed if:
-        //   - Hand is not a split OR split hands can be doubled on
+        // Hand is not a split OR split hands can be doubled on
         let can_double = self.splits == 0 || self.ctx.rules.can_double_after_split;
         let double = if can_double { Double.bitmap() } else { 0 };
 
