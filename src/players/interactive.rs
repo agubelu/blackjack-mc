@@ -8,7 +8,7 @@ impl Player for InteractivePlayer {
 
     fn reset_count(&mut self) { }
 
-    fn decide(&self, _hand: Hand, _card: u8, _first: bool) -> Action {
+    fn decide(&self, _hand: Hand, _card: u8, _allowed: u8) -> Action {
         print!("Action? (h)it / (s)tand / (d)ouble / (q) surrender / (x) split: ");
         stdout().flush().unwrap();
         let mut input = [0u8, 0u8];

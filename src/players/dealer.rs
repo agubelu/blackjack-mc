@@ -11,7 +11,7 @@ impl Player for Dealer {
         unimplemented!();
     }
 
-    fn decide(&self, hand: Hand, _card: u8, _first: bool) -> Action {
+    fn decide(&self, hand: Hand, _card: u8, _allowed: u8) -> Action {
         if hand.value() < 17 { Action::Hit } else { Action::Stand } // TODO: custom hard/soft thresholds
     }
 

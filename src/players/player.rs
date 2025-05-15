@@ -5,7 +5,7 @@ pub trait Player {
 
     fn reset_count(&mut self);
 
-    fn decide(&self, hand: Hand, card: u8, first: bool) -> Action; // Add ref to game rules
+    fn decide(&self, hand: Hand, card: u8, allowed: u8) -> Action;
 
     fn place_bet(&self) -> i32;
 }

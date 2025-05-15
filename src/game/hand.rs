@@ -8,7 +8,7 @@ pub enum Hand {
 }
 
 impl Hand {
-    pub fn from_cards(c1: u8, c2: u8) -> Self {
+    pub const fn from_cards(c1: u8, c2: u8) -> Self {
         match (c1, c2) {
             _ if c1 == c2 => Doubles(c1),
             (1, _) | (_, 1) => Soft(c1 + c2 + 10),
@@ -25,7 +25,7 @@ impl Hand {
         }
     }
 
-    pub fn unpack(&self) -> u8 {
+    pub const fn unpack(&self) -> u8 {
         match self {
             Soft(x) => *x,
             Hard(x) => *x,

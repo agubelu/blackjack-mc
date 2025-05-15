@@ -28,7 +28,7 @@ pub struct Rules {
     pub can_double_after_split: bool,
 
     #[arg(short = 'm', long)]
-    pub max_split_hands: Option<usize>,
+    pub max_split_hands: Option<u32>,
 
     #[arg(short = 'c', long)]
     pub player_counts_cards: bool,

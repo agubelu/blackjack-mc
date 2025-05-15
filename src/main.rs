@@ -12,5 +12,4 @@ pub use sim::Sim;
 
 fn main() {
     let x = 8u8.trailing_zeros();
-    println!("{x}");
 }
