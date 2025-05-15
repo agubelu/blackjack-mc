@@ -41,7 +41,7 @@ impl<'a> Round<'a> {
         if player_val == 21 {
             // Dealer doesn't have BJ, player wins
             debug_println!("Player blackjack");
-            return (self.bet as f32 * 1.5) as i32;
+            return (self.bet as f32 * self.ctx.rules.blackjack_pays) as i32;
         }
 
         // Game's on
@@ -74,6 +74,8 @@ impl<'a> Round<'a> {
         while hand.value() <= 21 {
             debug_println!("Your hand: {hand:?}, dealer card: {}", self.dealer_upcard);
             let action = self.ctx.player.decide(hand, self.dealer_upcard, actions);
+            assert!(action.bitmap() & actions != 0, "Illegal action");
+
             // After the first action, the only possible moves are hit, stand or surrender (if allowed).
             actions = Hit | Stand | self.ctx.surr_flag;
 
@@ -101,6 +103,7 @@ impl<'a> Round<'a> {
         if hand_value <= 21 { vec![(hand_value, this_bet)] } else { vec![] }
     }
 
+    /// Returns the final bets after splitting a hard on a given card
     fn split(&mut self, card: u8) -> Vec<HandBet> {
         self.spent += self.bet;
         self.splits += 1;
