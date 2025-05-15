@@ -3,8 +3,6 @@ use debug_print::debug_println;
 
 pub struct Round<'a> {
     ctx: &'a mut Sim,
-    player_hand: Hand,
-    dealer_hand: Hand,
     dealer_upcard: u8,
     bet: i32,
     spent: i32,
@@ -15,25 +13,25 @@ pub struct Round<'a> {
 type HandBet = (u8, i32);
 
 impl<'a> Round<'a> {
-    pub fn new(sim: &'a mut Sim, bet: i32) -> Self {
-        // Start a new round drawing cards from the shoe
-        let drawn: [u8; 4] = std::array::from_fn(|_| sim.shoe.draw());
-        let player_hand = Hand::from_cards(drawn[0], drawn[2]);
-        let dealer_hand = Hand::from_cards(drawn[1], drawn[3]);
-
-        // We can let the player observe the hole card now because the bet has already been made,
-        // and it will be revealed anyways at the end of the round, so that logic is simplified.
-        drawn.iter().for_each(|&c| sim.player.observe_card(c));
-
-        Self { ctx: sim, player_hand, dealer_hand, bet, dealer_upcard: drawn[1], spent: bet, splits: 0 }
+    pub fn new(sim: &'a mut Sim) -> Self {
+        Self { ctx: sim, bet: 0, dealer_upcard: 0, spent: 0, splits: 0 }
     }
 
     /// Simulates a round of play and returns how much net money the player earned or lost.
     /// 0 => player got his bet back, positive or negative values indicate gain or loss.
-    pub fn play(&mut self) -> i32 {
+    pub fn play(&mut self, bet: i32) -> i32 {
+        self.bet = bet;
+        self.spent = bet;
+
+        // We can let the player observe the hole card now because the bet has already been made,
+        // and it will be revealed anyways at the end of the round, so that logic is simplified.
+        self.dealer_upcard = self.draw();
+        let mut dealer_hand = Hand::from_cards(self.dealer_upcard, self.draw());
+        let player_hand = Hand::from_cards(self.draw(), self.draw());
+
         // Check for blackjacks
-        let player_val = self.player_hand.value();
-        let dealer_val = self.dealer_hand.value();
+        let player_val = player_hand.value();
+        let dealer_val = dealer_hand.value();
 
         if dealer_val == 21 {
             debug_println!("Dealer blackjack");
@@ -47,27 +45,27 @@ impl<'a> Round<'a> {
         }
 
         // Game's on
-        let player_hands = self.get_player_bets(self.player_hand);
+        let player_hands = self.get_player_bets(player_hand);
         if player_hands.is_empty() {
             debug_println!("You busted!");
             return -self.spent;
         }
 
         // Player has some hands alive, simulate dealer behavior.
-        while self.dealer_hand.value() <= 21 {
-            let action = self.ctx.dealer.decide(self.dealer_hand, 0, 0);
-            debug_println!("Dealer has: {:?} -> {action:?}", self.dealer_hand);
+        while dealer_hand.value() <= 21 {
+            let action = self.ctx.dealer.decide(dealer_hand, 0, 0);
+            debug_println!("Dealer has: {:?} -> {action:?}", dealer_hand);
             match action {
                 Hit => {
                     let card = self.draw();
-                    self.dealer_hand = self.dealer_hand.add_card(card);
+                    dealer_hand = dealer_hand.add_card(card);
                 }
                 Stand => break,
                 Double | Split | Surrender => panic!("Suspicious dealer behavior."),
             }
         }
 
-        let dealer_hand = self.dealer_hand.value();
+        let dealer_hand = dealer_hand.value();
         let payout: i32 = player_hands.into_iter().map(|x| hand_payout(x, dealer_hand)).sum();
         payout - self.spent
     }
@@ -155,7 +153,6 @@ impl<'a> Round<'a> {
         // Draws a card, allowing the player to see it
         let card = self.ctx.shoe.draw();
         self.ctx.player.observe_card(card);
-        debug_println!("Drew: {card}");
         card
     }
 }
