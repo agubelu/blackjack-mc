@@ -1,9 +1,8 @@
+use std::iter;
 use rand::rng;
 use rand::seq::SliceRandom;
-use std::iter;
 
 pub struct Shoe {
-    n_decks: usize,
     cutoff: usize,
     cards: Vec<u8>,
     ix: usize,
@@ -19,7 +18,7 @@ impl Shoe {
             cards.extend(iter::repeat_n(i, reps));
         }
         cards.shuffle(&mut rng());
-        Self { n_decks, cutoff, cards, ix: 0 }
+        Self { cutoff, cards, ix: 0 }
     }
 
     pub fn is_exhausted(&self) -> bool {

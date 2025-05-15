@@ -1,19 +1,7 @@
-use std::array;
-
-use Action::*;
-use crate::{Hand, Sim};
+use crate::{Hand, Sim, Action::{self, *}};
 use debug_print::{debug_println, debug_print};
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum Action {
-    Hit,
-    Stand,
-    Double,
-    Split,
-    Surrender,
-}
-
-pub struct Game<'a> {
+pub struct Round<'a> {
     ctx: &'a mut Sim,
     player_hand: Hand,
     dealer_hand: Hand,
@@ -25,10 +13,10 @@ pub struct Game<'a> {
 // Final value of a hand and its associated bet before the dealer starts drawing
 type HandBet = (u8, i32);
 
-impl<'a> Game<'a> {
+impl<'a> Round<'a> {
     pub fn new(sim: &'a mut Sim, bet: i32) -> Self {
         // Start a new round drawing cards from the shoe
-        let drawn: [u8; 4] = array::from_fn(|_| sim.shoe.draw());
+        let drawn: [u8; 4] = std::array::from_fn(|_| sim.shoe.draw());
         let player_hand = Hand::from_cards(drawn[0], drawn[2]);
         let dealer_hand = Hand::from_cards(drawn[1], drawn[3]);
 
