@@ -16,7 +16,7 @@ pub use sim::Sim;
 fn main() {
     let rules = Rules::parse();
     let player = Box::new(players::interactive::InteractivePlayer{});
-    let dealer = Dealer{};
+    let dealer = Dealer::new(rules.dealer_hits_soft_17);
     let shoe = Shoe::new(rules.n_decks, rules.penetration);
     let surr_flag = if rules.can_surrender { Action::Surrender.bitmap() } else { 0 };
     let mut sim = Sim { rules, player, dealer, shoe, surr_flag };

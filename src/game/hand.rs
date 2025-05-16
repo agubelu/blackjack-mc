@@ -1,6 +1,6 @@
 use Hand::*;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Hand {
     Soft(u8),
     Hard(u8),
