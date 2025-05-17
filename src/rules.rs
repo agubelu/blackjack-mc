@@ -1,3 +1,5 @@
+
+use std::env::args;
 use clap::Parser;
 
 #[derive(Parser, Debug)]
@@ -6,7 +8,7 @@ pub struct Rules {
     #[arg(short, long, default_value_t=6)]
     pub n_decks: usize,
 
-    #[arg(short, long, default_value_t=0.8)]
+    #[arg(short, long, default_value_t=0.75)]
     pub penetration: f32,
 
     #[arg(short, long, default_value_t=1.5)]
@@ -38,4 +40,33 @@ pub struct Rules {
 
     #[arg(short = 't', long)]
     pub dealer_wins_ties: bool,
+}
+
+impl Default for Rules {
+    fn default() -> Self {
+        Self {
+            n_decks: 6,
+            penetration: 0.75,
+            blackjack_pays: 1.5,
+            report_every: 10_000_000,
+            dealer_hits_soft_17: true,
+            can_surrender: false,
+            can_hit_split_aces: false,
+            can_resplit_aces: true,
+            can_double_after_split: true,
+            max_split_hands: Some(4),
+            player_counts_cards: false,
+            dealer_wins_ties: false,
+         }
+    }
+}
+
+impl Rules {
+    pub fn parse_or_default() -> Self {
+        if args().len() < 2 {
+            Self::default()
+        } else {
+            Self::parse()
+        }
+    }
 }

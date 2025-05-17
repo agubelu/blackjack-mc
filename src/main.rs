@@ -3,17 +3,13 @@ mod players;
 mod rules;
 mod sim;
 
-use clap::Parser;
-pub use game::hand::Hand;
-pub use game::action::Action;
-use game::round::Round;
-pub use game::shoe::Shoe;
+pub use game::{action::Action, hand::Hand, round::Round, shoe::Shoe};
 pub use players::player::Player;
 pub use rules::Rules;
 pub use sim::Sim;
 
 fn main() {
-    let mut sim = Sim::new(Rules::parse());
+    let mut sim = Sim::new(Rules::parse_or_default());
 
     let mut total_spent = 0;
     let mut net_gain = 0;
