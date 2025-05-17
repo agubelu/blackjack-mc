@@ -8,23 +8,34 @@ pub use game::hand::Hand;
 pub use game::action::Action;
 use game::round::Round;
 pub use game::shoe::Shoe;
-use players::dealer::Dealer;
 pub use players::player::Player;
 pub use rules::Rules;
 pub use sim::Sim;
 
 fn main() {
-    let rules = Rules::parse();
-    let player = Box::new(players::interactive::InteractivePlayer{});
-    let dealer = Dealer::new(rules.dealer_hits_soft_17);
-    let shoe = Shoe::new(rules.n_decks, rules.penetration);
-    let surr_flag = if rules.can_surrender { Action::Surrender.bitmap() } else { 0 };
-    let mut sim = Sim { rules, player, dealer, shoe, surr_flag };
+    let mut sim = Sim::new(Rules::parse());
+
+    let mut total_spent: i64 = 0;
+    let mut net_gain: i64 = 0;
+    let mut to_report = sim.rules.report_every;
 
     loop {
+        if sim.shoe.is_exhausted() {
+            sim.shoe.reshuffle();
+            sim.player.reset_count();
+        }
+
+        let bet = sim.player.place_bet();
+        total_spent += bet as i64;
+
         let mut round = Round::new(&mut sim);
-        let net = round.play(10);
-        println!("Net: {net:+}");
-        println!("----------------------");
+        net_gain += round.play(bet) as i64;
+
+        to_report -= 1;
+        if to_report == 0 {
+            to_report = sim.rules.report_every;
+            let perc = net_gain as f32 / total_spent as f32 * 100.0;
+            println!("Total spent: {total_spent}, net: {net_gain:+} ({perc:.2} %)");
+        }
     }
 }

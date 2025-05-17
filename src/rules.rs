@@ -12,6 +12,9 @@ pub struct Rules {
     #[arg(short, long, default_value_t=1.5)]
     pub blackjack_pays: f32,
 
+    #[arg(short, long, default_value_t=10_000_000)]
+    pub report_every: u32,
+
     #[arg(short = 's', long)]
     pub dealer_hits_soft_17: bool,
 
@@ -33,6 +36,6 @@ pub struct Rules {
     #[arg(short = 'c', long)]
     pub player_counts_cards: bool,
 
-    #[arg(short = 'i', long)]
-    pub interactive_play: bool,
+    #[arg(short = 't', long)]
+    pub dealer_wins_ties: bool,
 }

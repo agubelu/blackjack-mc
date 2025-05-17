@@ -19,7 +19,7 @@ impl Player for Dealer {
         unimplemented!();
     }
 
-    fn decide(&self, hand: Hand, _card: u8, _allowed: u8) -> Action {
+    fn decide(&self, hand: Hand, _dealer: u8, _allowed: u8) -> Action {
         if hand.value() < 17 || hand == Hand::Soft(17) && self.hit_soft_17 {
             Action::Hit
         } else {

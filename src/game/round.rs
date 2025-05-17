@@ -60,7 +60,7 @@ impl<'a> Round<'a> {
         }
 
         let dealer_hand = dealer_hand.value();
-        let payout: i32 = player_hands.into_iter().map(|x| hand_payout(x, dealer_hand)).sum();
+        let payout: i32 = player_hands.into_iter().map(|x| self.hand_payout(x, dealer_hand)).sum();
         payout - self.spent
     }
 
@@ -131,7 +131,7 @@ impl<'a> Round<'a> {
         // Splitting is allowed if:
         // Hands is doubles AND max splits not reached AND (first split OR hand isn't aces OR aces can be resplit)
         let can_split = matches!(hand, Hand::Doubles(_)) &&
-                        self.splits + 1 < self.ctx.rules.max_split_hands.unwrap_or(u32::MAX) &&
+                        self.splits + 1 < self.ctx.max_split_hands &&
                         (self.splits == 0 || hand.unpack() != 1 || self.ctx.rules.can_resplit_aces);
         let split = if can_split { Split.bitmap() } else { 0 };
 
@@ -146,24 +146,25 @@ impl<'a> Round<'a> {
         double | split | Hit | Stand | self.ctx.surr_flag
     }
 
+    /// Draws a card, allowing the player to see it
     fn draw(&mut self) -> u8 {
-        // Draws a card, allowing the player to see it
         let card = self.ctx.shoe.draw();
         self.ctx.player.observe_card(card);
         card
     }
-}
 
-/// Payout for a given player hand. It is assumed that the value of the player hand is <= 21.
-fn hand_payout((player, bet): HandBet, dealer: u8) -> i32 {
-    if dealer > 21 || player > dealer {
-        debug_println!("You win!");
-        2 * bet
-    } else if player == dealer {
-        debug_println!("Tie");
-        bet
-    } else {
-        debug_println!("You lost :(");
-        0
+    /// Payout for a given player hand. It is assumed that the value of the player hand is <= 21.
+    fn hand_payout(&self, (player, bet): HandBet, dealer: u8) -> i32 {
+        if dealer > 21 || player > dealer {
+            debug_println!("You win!");
+            2 * bet
+        } else if player == dealer && !self.ctx.rules.dealer_wins_ties {
+            debug_println!("Tie");
+            bet
+        } else {
+            debug_println!("You lost :(");
+            0
+        }
     }
 }
+
