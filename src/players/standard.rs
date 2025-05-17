@@ -13,5 +13,5 @@ impl Player for StandardPlayer {
         Action::from_bitmap(actions & allowed)
     }
 
-    fn place_bet(&self) -> i32 { 10 }
+    fn place_bet(&self) -> i64 { 10 }
 }

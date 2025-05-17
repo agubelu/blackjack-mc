@@ -7,5 +7,5 @@ pub trait Player {
 
     fn decide(&self, hand: Hand, dealer: u8, allowed: u8) -> Action;
 
-    fn place_bet(&self) -> i32;
+    fn place_bet(&self) -> i64;
 }

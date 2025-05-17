@@ -15,9 +15,9 @@ pub use sim::Sim;
 fn main() {
     let mut sim = Sim::new(Rules::parse());
 
-    let mut total_spent: i64 = 0;
-    let mut net_gain: i64 = 0;
-    let mut to_report = sim.rules.report_every;
+    let mut total_spent = 0;
+    let mut net_gain = 0;
+    let mut i = sim.rules.report_every;
 
     loop {
         if sim.shoe.is_exhausted() {
@@ -26,14 +26,14 @@ fn main() {
         }
 
         let bet = sim.player.place_bet();
-        total_spent += bet as i64;
+        total_spent += bet;
 
         let mut round = Round::new(&mut sim);
-        net_gain += round.play(bet) as i64;
+        net_gain += round.play(bet);
 
-        to_report -= 1;
-        if to_report == 0 {
-            to_report = sim.rules.report_every;
+        i -= 1;
+        if i == 0 {
+            i = sim.rules.report_every;
             let perc = net_gain as f32 / total_spent as f32 * 100.0;
             println!("Total spent: {total_spent}, net: {net_gain:+} ({perc:.2} %)");
         }

@@ -4,13 +4,13 @@ use debug_print::debug_println;
 pub struct Round<'a> {
     ctx: &'a mut Sim,
     dealer_upcard: u8,
-    bet: i32,
-    spent: i32,
+    bet: i64,
+    spent: i64,
     splits: u32,
 }
 
 // Final value of a hand and its associated bet before the dealer starts drawing
-type HandBet = (u8, i32);
+type HandBet = (u8, i64);
 
 impl<'a> Round<'a> {
     pub fn new(sim: &'a mut Sim) -> Self {
@@ -19,7 +19,7 @@ impl<'a> Round<'a> {
 
     /// Simulates a round of play and returns how much net money the player earned or lost.
     /// 0 => player got his bet back, positive or negative values indicate gain or loss.
-    pub fn play(&mut self, bet: i32) -> i32 {
+    pub fn play(&mut self, bet: i64) -> i64 {
         self.bet = bet;
         self.spent = bet;
 
@@ -41,7 +41,7 @@ impl<'a> Round<'a> {
         if player_val == 21 {
             // Dealer doesn't have BJ, player wins
             debug_println!("Player blackjack");
-            return (self.bet as f32 * self.ctx.rules.blackjack_pays) as i32;
+            return (self.bet as f32 * self.ctx.rules.blackjack_pays) as i64;
         }
 
         // Game's on
@@ -60,7 +60,7 @@ impl<'a> Round<'a> {
         }
 
         let dealer_hand = dealer_hand.value();
-        let payout: i32 = player_hands.into_iter().map(|x| self.hand_payout(x, dealer_hand)).sum();
+        let payout: i64 = player_hands.into_iter().map(|x| self.hand_payout(x, dealer_hand)).sum();
         payout - self.spent
     }
 
@@ -154,7 +154,7 @@ impl<'a> Round<'a> {
     }
 
     /// Payout for a given player hand. It is assumed that the value of the player hand is <= 21.
-    fn hand_payout(&self, (player, bet): HandBet, dealer: u8) -> i32 {
+    fn hand_payout(&self, (player, bet): HandBet, dealer: u8) -> i64 {
         if dealer > 21 || player > dealer {
             debug_println!("You win!");
             2 * bet

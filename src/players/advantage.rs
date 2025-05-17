@@ -33,12 +33,12 @@ impl Player for CardCounter {
         Action::from_bitmap(actions & allowed)
     }
 
-    fn place_bet(&self) -> i32 {
+    fn place_bet(&self) -> i64 {
         let decks_remaining = self.n_decks as f32 - (self.total as f32 / 52.0);
-        let true_count = (self.running as f32 / decks_remaining).round() as i32;
+        let true_count = (self.running as f32 / decks_remaining).round() as i64;
         match true_count {
-            ..1 => 0,
-            x => x * 10,
+            ..1 => 10,
+            x => x * 20,
         }
     }
 }

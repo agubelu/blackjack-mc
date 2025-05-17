@@ -27,5 +27,5 @@ impl Player for InteractivePlayer {
         action
     }
 
-    fn place_bet(&self) -> i32 { 10 }
+    fn place_bet(&self) -> i64 { 10 }
 }

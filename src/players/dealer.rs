@@ -27,7 +27,7 @@ impl Player for Dealer {
         }
     }
 
-    fn place_bet(&self) -> i32 {
+    fn place_bet(&self) -> i64 {
         unimplemented!();
     }
 }
