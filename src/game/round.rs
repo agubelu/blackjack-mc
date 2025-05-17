@@ -148,6 +148,11 @@ impl<'a> Round<'a> {
 
     /// Draws a card, allowing the player to see it
     fn draw(&mut self) -> u8 {
+        if self.ctx.shoe.is_exhausted() {
+            self.ctx.shoe.reshuffle();
+            self.ctx.player.reset_count();
+        }
+
         let card = self.ctx.shoe.draw();
         self.ctx.player.observe_card(card);
         card

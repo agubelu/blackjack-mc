@@ -31,8 +31,7 @@ impl Shoe {
     }
 
     pub fn draw(&mut self) -> u8 {
-        // If penetration is too high and the shoe runs out of cards mid hand,
-        // this panics and the casino will catch fire and blow up.
+        // The caller is responsible for re-shuffling the shoe when appropriate to avoid running out of cards.
         let card = self.cards[self.ix];
         self.ix += 1;
         card
