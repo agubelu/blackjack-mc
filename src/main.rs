@@ -13,23 +13,18 @@ fn main() {
 
     let mut total_spent = 0;
     let mut net_gain = 0;
-    let mut i = sim.rules.report_every;
+    let mut i = 0;
 
     loop {
-        if sim.shoe.is_exhausted() {
-            sim.shoe.reshuffle();
-            sim.player.reset_count();
-        }
-
         let bet = sim.player.place_bet();
         total_spent += bet;
 
         let mut round = Round::new(&mut sim);
         net_gain += round.play(bet);
 
-        i -= 1;
-        if i == 0 {
-            i = sim.rules.report_every;
+        i += 1;
+        if i == sim.rules.report_every {
+            i = 0;
             let perc = net_gain as f32 / total_spent as f32 * 100.0;
             println!("Total spent: {total_spent}, net: {net_gain:+} ({perc:.2} %)");
         }
